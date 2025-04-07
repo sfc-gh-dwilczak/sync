@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Processor</title>
+</head>
+<body>
+    <h1>Select a Video to Process from S3</h1>
+    <form id="videoForm">
+        <label for="filename">Video File:</label>
+        <select name="filename" id="filename">
+            {% for file in files %}
+                <option value="{{ file }}">{{ file }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Process Video</button>
+    </form>
+    <h2>Result</h2>
+    <pre id="result"></pre>
+    <script>
+      document.getElementById('videoForm').addEventListener('submit', async function(event) {
+         event.preventDefault(); // Prevent the default form submission
+         const filename = document.getElementById('filename').value;
+         // Create a payload in the expected JSON format
+         const payload = { data: [[0, filename]] };
+         
+         try {
+           const response = await fetch('/process-video', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify(payload)
+           });
+           const result = await response.json();
+           document.getElementById('result').innerText = JSON.stringify(result, null, 2);
+         } catch (error) {
+           document.getElementById('result').innerText = 'Error: ' + error;
+         }
+      });
+    </script>
+</body>
+</html>
